@@ -1,0 +1,105 @@
+#ifndef CLARA_API
+#define CLARA_API
+#include <cstdio>
+#include <inttypes.h>
+
+#if defined(_MSC_VER) && !defined(CLARA_STATIC)
+	#ifdef CLARA_EXPORTS
+		#define CLARA_DLL __declspec(dllexport)
+	#else
+		#define CLARA_DLL __declspec(dllimport)
+	#endif
+#else
+	#define CLARA_DLL
+#endif
+#if defined(__cplusplus) && !defined(CLARA_EXPORTS)
+	#define CLARA_NAMESPACE_BEGIN namespace CLARA {
+	#define CLARA_NAMESPACE_END }
+#else
+	#define CLARA_NAMESPACE_BEGIN
+	#define CLARA_NAMESPACE_END
+#endif
+
+#define CLARA_ASSEMBLY_VER_MAJOR 0
+#define CLARA_ASSEMBLY_VER_MINOR 1
+
+CLARA_NAMESPACE_BEGIN
+
+enum CLARA_ERROR {
+	// error types
+	CLARA_ERROR_NONE,			// no error - OK status
+	CLARA_ERROR_INTERRUPTED,	// interrupted by request
+	CLARA_ERROR_OPEN_FILE,		// failed to open file
+
+	// code errors
+	CLARA_ERROR_INVALID_DIRECTIVE,
+	CLARA_ERROR_INVALID_MNEMONIC,
+};
+enum CLARA_MNEMONIC {
+	CLARA_BAD_MNEMONIC = -1,
+
+	// debug
+	CLARA_NOP, CLARA_BREAK, CLARA_THROW,
+	// stack
+	CLARA_PUSH, CLARA_PUSHAB, CLARA_PUSHAW, CLARA_PUSHAD, CLARA_PUSHAF, CLARA_POP, CLARA_SWAP, CLARA_DUP,
+	// variable
+	CLARA_LOCAL, CLARA_GLOBAL, CLARA_ARRAY,
+	// operations
+	CLARA_EXF, CLARA_INC, CLARA_DEC, CLARA_ADD, CLARA_SUB, CLARA_MUL, CLARA_DIV, CLARA_MOD,
+	CLARA_AND, CLARA_OR, CLARA_XOR, CLARA_SHL, CLARA_SHR, CLARA_NEG, CLARA_NOT,
+	CLARA_TOI, CLARA_TOF,
+	// comparison
+	CLARA_CMPNN, CLARA_CMPE, CLARA_CMPNE, CLARA_CMPGE, CLARA_CMPLE, CLARA_CMPG, CLARA_CMPL,
+	CLARA_IF, CLARA_EVAL,
+	// branching
+	CLARA_JT, CLARA_JNT, CLARA_JMP, CLARA_SWITCH, CLARA_RSWITCH,
+	// functions
+	CLARA_CALL, CLARA_ENTER, CLARA_RET
+};
+enum CLARA_INSTRUCTION : char {
+	INSN_INVALID = -1,
+	// Misc
+	INSN_NOP, INSN_BREAK, INSN_THROW,
+	// Stack Manipulation
+	INSN_PUSHN, INSN_PUSHB, INSN_PUSHW, INSN_PUSHD, INSN_PUSHF,
+	INSN_PUSHAB, INSN_PUSHAW, INSN_PUSHAD, INSN_PUSHAF, INSN_PUSHS,
+	INSN_POP, INSN_POPLN, INSN_POPL, INSN_POPLE, INSN_POPV, INSN_POPVE,
+	INSN_SWAP, INSN_DUP, INSN_DUPE,
+	// Variable Access
+	INSN_LOCAL, INSN_GLOBAL, INSN_ARRAY,
+	// Arithimetic/Bitwise/Conversion Operations
+	INSN_EXF, INSN_INC, INSN_DEC, INSN_ADD, INSN_SUB, INSN_MUL, INSN_DIV, INSN_MOD,
+	INSN_AND, INSN_OR, INSN_XOR, INSN_SHL, INSN_SHR,
+	INSN_NEG, INSN_NOT,
+	INSN_TOI, INSN_TOF,
+	// Comparison
+	INSN_CMPNN, INSN_CMPE, INSN_CMPNE, INSN_CMPGE, INSN_CMPLE, INSN_CMPG, INSN_CMPL,
+	INSN_IF, INSN_EVAL,
+	// Branching
+	INSN_JT, INSN_JNT, INSN_JMP, INSN_JMPA, INSN_SWITCH, INSN_RSWITCH,
+	// Functions
+	INSN_CALL, INSN_CALLA, INSN_ENTER, INSN_RET,
+
+	MAX_INSN,
+};
+enum CLARA_OPCODE {
+
+};
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+	// CLARA.dll exports
+	CLARA_ERROR Compile(const char* in, const char* out);
+	CLARA_ERROR SetOutputHandler(bool(*func)(const char*));
+	CLARA_ERROR SetErrorHandler(bool(*func)(CLARA_ERROR, const char *));
+
+#ifdef __cplusplus
+}
+#endif
+
+CLARA_NAMESPACE_END
+
+#endif

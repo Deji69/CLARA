@@ -1,0 +1,39 @@
+; > This is a comment and is ignored by CLARA <
+
+; This is a directive used to set compilation and parsing parameters
+.instructionsize 1				; Comments can appear at the end of any line
+.integersize 4
+; Declare globals with .globals - these are all built into one segment and indexed on compilation
+.globals a b c
+; Declare strings with .strings - these are also compiled into a single segment and indexed - strings can also be used directly in code
+.strings WELCOME "Welcome string"
+
+push a,b,c
+push WELCOME, push "Welcome string"
+
+.locals 
+push 
+
+; Note: CLARA is completely case-insensitive
+;nop								; This is an instruction represented by the mnemonic 'nop', which will be compiled by CLARA
+;push 0							; This instruction has a parameter - the value '0' is pushed to the stack
+;push							; This is equivalent to the instruction above (where optimised) and pushes NULL with the value '0' to the stack
+;push, nop, nop					; Multiple instructions can appear on a line when separated by a comma
+;push 0,1, 22					; Instructions can be repeated with differing parameters, omitting the mnemonic, this pushes 0, 1 and 22 (in order)
+;pop 3, pop, pop, pop			; Pops all current items off of the stack
+
+; Now to cover operations...
+;push 2,2, add					; Here we can add 2 and 2 - the result is a single item on the stack with a value of '4'
+;pop
+
+; CLARA is able to automatically determine how to push items by simply providing the operation mnemonic with the parameters required
+; Note that 'add' and 'sub' can have one or two params - if only one is used, the top stack item is treated as the first param
+;add 2 3, sub 4			; Pushes 2, pushes 3, pops 3, pops 2, pushes 3 + 2,  twice Leaves the value '1' on the stack
+
+; Note that this will first add 2 to the last item on the stack (currently '1'), then add 2 again, resulting in 5
+; Thus "add 2,2" == "add 2, add 2", be careful not to confuse it with "add 2 2"
+;add 2,2
+
+nop,push 0,push,push,nop,nop,push 0,1,22,pop 3,pop,pop,pop,push 2,2,add,pop,add 2 3,sub 4,add 2,2
+
+;break
